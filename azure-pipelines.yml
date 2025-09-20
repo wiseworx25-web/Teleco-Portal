@@ -1,0 +1,69 @@
+# azure-pipelines.yml
+# Purpose: Simulate CI process for TelcoConnect Customer Portal
+# Flow: Trigger on push → Simulate Docker build → Simulate ACR push
+
+trigger:
+  - main   # Runs automatically when code is pushed to 'main' branch
+
+pool:
+  vmImage: 'ubuntu-latest'   # Use a fast, clean Linux machine in the cloud
+
+variables:
+  serviceName: 'telco-customer-portal'
+  imageRepository: 'customer-portal-web'
+  imageTag: '$(Build.BuildId)'   # Unique tag for each build (e.g., 20241006.1)
+  environment: 'dev'
+
+steps:
+  - script: |
+      echo "🚀 STARTING CI BUILD"
+      echo "Service: $(serviceName)"
+      echo "Environment: $(environment)"
+      echo "Build ID: $(imageTag)"
+      echo "Branch: $(Build.SourceBranchName)"
+      echo "----------------------------------------"
+      ls -la
+    displayName: '🔍 Step 1: Show Build Info'
+
+  - script: |
+      echo "📦 STEP 2: SIMULATING DOCKER IMAGE BUILD..."
+      
+      # Check if Dockerfile exists
+      if [ -f Dockerfile ]; then
+        echo "✅ SUCCESS: Dockerfile found!"
+      else
+        echo "❌ ERROR: No Dockerfile found in repository!"
+        echo "Please check that 'Dockerfile' is in the root of your repo."
+        exit 1
+      fi
+      
+      # Simulate the docker build command
+      echo "Running simulated command:"
+      echo "docker build -t $(imageRepository):$(imageTag) ."
+      
+      # Pretend it takes time
+      sleep 3
+      
+      echo "🎉 Simulated build completed successfully!"
+    displayName: '🏗️ Step 2: Simulate Docker Build'
+
+  - script: |
+      echo "📤 STEP 3: SIMULATING PUSH TO AZURE CONTAINER REGISTRY (ACR)..."
+      
+      # Simulate connection to ACR
+      echo "Connecting to container registry..."
+      sleep 1
+      
+      # Show what the full image name would be
+      echo "Image Tag: $(containerRegistry)/$(imageRepository):$(imageTag)"
+      echo "Uploading layers..."
+      echo "Layer 1: config.json [==================] 100%"
+      sleep 1
+      echo "Layer 2: nginx-alpine [==================] 100%"
+      sleep 1
+      echo "Layer 3: website files [==================] 100%"
+      sleep 1
+      
+      echo "✅ Image successfully pushed to ACR!"
+      echo "Now available for deployment to AKS."
+    displayName: '☁️ Step 3: Simulate Push to ACR'
